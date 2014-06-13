@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/fullcalendar/1.6.4/fullcalendar.min.js"></script>
+<script type="text/javascript" src="scripts/gcal.js"></script>
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/fullcalendar/1.6.4/fullcalendar.css" type="text/css" />
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/fullcalendar/1.6.4/fullcalendar.print.css" />
+<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.2/pure-min.css" />
+<link rel="stylesheet" href="styles/side-menu.css" />
+<style>
+#calendar { width: 750px; margin-top:50px;}
+</style>
+</head>
+
+<body>
+    <div id="layout">
+        <!-- Menu toggle -->
+        <a href="#menu" id="menuLink" class="menu-link">
+            <!-- Hamburger icon -->
+            <span></span>
+        </a>
+
+        <div id="menu">
+            <div class="pure-menu pure-menu-open">
+                <a class="pure-menu-heading" href="#">DCFemTech</a>
+
+                <ul>
+                    <li class="menu-item-divided pure-menu-selected"><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="latest.html">@DCFemTech</a></li>
+                    <li><a href="resources.html">Resources</a></li>
+                    <li><a href="codecoffee.html">Code & Coffee</a></li>
+                    <li><a href="newsletter.html">Newsletter</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+
+                </ul>
+            </div>
+        </div>
+
+        <div id="main">
+            <div class="header">
+                <h1>#DCFemTech</h1>
+                <h2>Resistance is futile</h2>
+            </div>
+
+            <div class="content">
+
+                <h1 class="content-subhead">This Month's Events!</h1>
+                <p>DCFemTech is a collective of several women focused tech groups in the DC, Maryland and Virginia area. </p>
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    // page is now ready, initialize the calendar...
+    $('#calendar').fullCalendar({
+        eventSources: [ {
+                            url: 'https://www.google.com/calendar/feeds/7nffm8fujjn1gim5auqnqbbr24%40group.calendar.google.com/public/basic',
+                            className: 'DCFemTech'
+                        },
+                        {
+                            url: 'https://www.google.com/calendar/feeds/project101dc%40gmail.com/public/basic',
+                            className: 'Project101'
+                        }
+                      ]
+    });
+
+
+    var fetch_meetups = function(){
+
+        var groups = ['Ladies-Who-Code-Washington-DC','Girl-Develop-It-DC', 'dc-pyladies', 'Women-Who-Code-DC' ];
+        var api_url = 'http://api.meetup.com/2/events?order=time&key=2721217a7241b22132f3f30c715f64&group_urlname=NAME&callback=?';
+
+        for (i in groups){
+            var group_name = groups[i];
+            $.getJSON(api_url.replace('NAME', group_name),
+                function(data, text_status, jqxhr){
+
+                    var events = [];
+
+                    for (e in data['results']) {
+                        var event = data['results'][e];
+                        var date = new Date(event['time']).toString();
+                        var o = {
+                           'title': event['group']['name'] + ' - ' + event['name'],
+                           'start': date,
+                           'url': event['event_url'],
+                           'className': event['group']['urlname'].toLowerCase()
+                        };
+                        events.push(o);
+                    }
+
+                    $('#calendar').fullCalendar('addEventSource', events);
+                }
+            )
+
+        }
+
+    }
+
+    fetch_meetups();
+});
+
+</script>
+<script type="text/javascript" src="scripts/ui.js"></script>
+</body>
+</html>
